@@ -1,11 +1,14 @@
 #!/bin/zsh
 download_proton(){
 
-    tag_proton=$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest \
-		     | grep "tag_name" \
-		     | awk '{print substr($2, 2, length($2) -3)}')
-
-    data_file=~/.glorious-data.txt
+    if [ "$1" != "" ]; then
+	tag_proton=$2
+    else
+	tag_proton=$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest \
+			 | grep "tag_name" \
+			 | awk '{print substr($2, 2, length($2) -3)}')
+    fi
+    data_file=$1
 
     if grep -q "proton-GE $tag_proton" "$data_file"; then
 	echo "latest Glorious Eggroll Proton downloaded. Praise the Egg Roll."
@@ -25,10 +28,15 @@ download_proton(){
 }
 
 download_wine() {
-    tag_wine=$(curl -s https://api.github.com/repos/GloriousEggroll/wine-ge-custom/releases/latest \
-		   | grep "tag_name" \
-		   | awk '{print substr($2, 2, length($2) -3)}')
-    data_file=~/.glorious-data.txt
+
+    if [ "$1" != "" ]; then
+	tag_wine=$2
+    else
+	tag_wine=$(curl -s https://api.github.com/repos/GloriousEggroll/wine-ge-custom/releases/latest \
+		       | grep "tag_name" \
+		       | awk '{print substr($2, 2, length($2) -3)}')
+    fi
+    data_file=$1
     
     if grep -q "wine-GE $tag_wine" "$data_file"; then
 	echo "latest Glorious Eggroll Wine downloaded. Praise the Egg Roll."
@@ -48,17 +56,20 @@ download_wine() {
 }
 
 help_declaration(){
-    echo "Usage:"
-    echo "  glorious-eggroll-downloader.zsh <OPTION> -- downloads the latest GE custom variant\n"
+    echo "Usage: Glorious-eggroll-downloader [apw] [-t TAG]" 2>&1
+    echo "downloads the latest GE custom variant"
     echo "help options:"
-    echo "  -h    Displays this help screen\n"
-    echo "Options"
-    echo "  -a    Downloads both wine and proton"
-    echo "  -p    Downloads proton"
-    echo "  -w    Downloads wine"
+    echo "  -h          Displays this help screen"
+    echo "Options"      
+    echo "  -a          Downloads both wine and proton"
+    echo "  -p          Downloads proton"
+    echo "  -w          Downloads wine"
+    echo "  -t option   Specify target tag for download. Not advised to use with -a"
 }
 
 main(){
+    # this was an attempt at automatically switching to the help declaration function
+    # if opts were input.
     # if [ ! -z "$1" ]
     # then
     # 	help_declaration
@@ -68,10 +79,13 @@ main(){
     hflag=
     pflag=
     wflag=
+    tflag=
+
+    optstring=":ahpwt:"
     
-    while getopts ":ahpw" opt
+    while getopts ${optstring} opt
     do
-	case $opt in
+	case ${opt} in
 	    a)
 	        pflag=1
 		wflag=1
@@ -85,28 +99,39 @@ main(){
 	    w)
 		wflag=1
 		;;
+	    t)
+		tflag=${OPTARG}
+		;;
 	    \?)
 		echo "Invalid option: -$OPTARG" >&2
 		exit 1
 		;;
+	    :)
+		echo "Option -$OPTARG requires an argument." >&2
+		exit 1
+		;;
 	esac
+	
+
     done
+    shift $(($OPTIND - 1))
 
 
-
-    if [ "$pflag" -eq 1 ]; then
-	download_proton
-    fi
-
-    if [ "$wflag" -eq 1 ]; then
-	download_wine
-    fi
+    data_file=~/.glorious-data.txt
 
     if [ "$hflag" -eq 1 ]; then
 	help_declaration
-	exit
+	exit	
     fi
-    shift $(($OPTIND - 1))
+    
+    if [ "$pflag" -eq 1 ]; then
+	download_proton $data_file $tflag
+    fi
+
+    if [ "$wflag" -eq 1 ]; then
+	download_wine $data_file $tflag
+    fi
+
 
     exit
 }
