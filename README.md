@@ -1,6 +1,8 @@
 # Glorious Eggroll Downloader
 A simple downloader script for glorious eggroll's proton variants.
 
+This stores information about the downloaded versions in a file named `glorious-data.txt`, currently it is set to look for that in the home directory. It should be created automatically but may be a good idea to make it manually to be safe.
+
 ## Usage:
 The downloader requires input options to tell it what to do, otherwise it quits without doing anything.
 
