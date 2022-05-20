@@ -1,7 +1,7 @@
 #!/bin/zsh
 download_proton(){
 
-    if [ "$1" != "" ]; then
+    if [ "$2" != "" ]; then
 	tag_proton=$2
     else
 	tag_proton=$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest \
@@ -29,7 +29,7 @@ download_proton(){
 
 download_wine() {
 
-    if [ "$1" != "" ]; then
+    if [ "$2" != "" ]; then
 	tag_wine=$2
     else
 	tag_wine=$(curl -s https://api.github.com/repos/GloriousEggroll/wine-ge-custom/releases/latest \
